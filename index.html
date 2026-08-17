@@ -458,7 +458,7 @@ function renderLivePreview(){
   const box = $('#live-preview');
   const btn = $('#btn-ready');
   if(!teams){
-    box.innerHTML = '<p class="hint">Sélectionne exactement 2 joueurs pour l\\'équipe A.</p>';
+    box.innerHTML = "<p class=\"hint\">Sélectionne exactement 2 joueurs pour l'équipe A.</p>";
     btn.disabled = true;
     return;
   }
@@ -534,7 +534,7 @@ function renderPending(){
       const sa = inputA.value.trim();
       const sb = inputB.value.trim();
       if(sa === '' || sb === ''){
-        alert('Renseigne les deux scores avant d\\'enregistrer.');
+        alert("Renseigne les deux scores avant d'enregistrer.");
         return;
       }
       const match = matches.find(m=>m.id===id);
@@ -691,7 +691,7 @@ $('#btn-reset').addEventListener('click', async ()=>{
   renderDatabase();
   renderMatchView();
 });
- 
+
 // ---------- Init ----------
 (async function init(){
   matches = await loadMatches();
