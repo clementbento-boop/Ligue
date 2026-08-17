@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ligue de Foot</title>
+<title>Ligue de Jeux</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 
@@ -23,6 +23,7 @@
   --yellow:#FFD23F;
   --red:#FF5A5A;
   --grad-main:linear-gradient(135deg,#FF3D8A 0%,#8B5CF6 55%,#2DE2E6 100%);
+  --grad-golf:linear-gradient(135deg,#2DE2E6 0%,#8B5CF6 55%,#FFD23F 100%);
   --radius:20px;
   --radius-sm:14px;
 }
@@ -85,29 +86,31 @@ header p{
   font-weight:600;
 }
 
-/* Tabs — floating pill nav, Plato-style */
+/* Tabs — floating pill nav */
 nav.tabs{
   display:flex;
   justify-content:center;
   gap:6px;
   margin:24px auto 0;
-  max-width:520px;
+  max-width:620px;
   padding:6px;
   background:var(--card);
   border:1px solid var(--line-strong);
   border-radius:999px;
   box-shadow:0 12px 30px rgba(0,0,0,0.35);
+  overflow-x:auto;
 }
 .tab{
   flex:1;
   background:none;
   border:none;
   color:var(--muted);
-  font-size:13px;
-  letter-spacing:.5px;
+  font-size:12.5px;
+  letter-spacing:.4px;
   font-weight:600;
-  padding:11px 14px;
+  padding:11px 12px;
   border-radius:999px;
+  white-space:nowrap;
   transition:color .18s, background .18s, transform .12s;
 }
 .tab:hover{color:var(--ink);}
@@ -116,6 +119,7 @@ nav.tabs{
   background:var(--grad-main);
   box-shadow:0 4px 16px rgba(255,61,138,0.35);
 }
+.tab.active[data-tab="minigolf"]{background:var(--grad-golf);box-shadow:0 4px 16px rgba(45,226,230,0.3);}
 
 main{max-width:820px;margin:0 auto;padding:30px 18px 0;}
 .view{display:none;}
@@ -168,10 +172,14 @@ section.block .sub{color:var(--muted);font-size:13px;margin:0 0 18px;}
   transform:translateY(-1px);
 }
 .chip.selected .jersey{background:rgba(21,10,43,0.35);color:var(--bg-deep);border-color:transparent;}
+#view-minigolf .chip.selected{
+  background:var(--grad-golf);
+  box-shadow:0 6px 18px rgba(45,226,230,0.3);
+}
 .chip.disabled{opacity:.3;pointer-events:none;}
 .hint{font-size:12px;color:var(--muted);margin:-8px 0 18px;}
 
-/* Scoreboard */
+/* Scoreboard (foot) */
 .scoreboard{
   display:flex;align-items:center;justify-content:space-between;
   background:var(--bg-mid);
@@ -229,8 +237,37 @@ section.block .sub{color:var(--muted);font-size:13px;margin:0 0 18px;}
 .score-sep{color:var(--muted);font-size:20px;font-weight:700;}
 .live-dot{display:inline-flex;align-items:center;gap:6px;color:var(--pink);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;}
 .live-dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--pink);box-shadow:0 0 8px var(--pink);animation:pulse 1.4s infinite;}
+.live-dot.golf{color:var(--cyan);}
+.live-dot.golf::before{background:var(--cyan);box-shadow:0 0 8px var(--cyan);}
 @media (prefers-reduced-motion: reduce){.live-dot::before{animation:none;}}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+
+/* Mini golf board */
+.golf-board{
+  background:var(--bg-mid);
+  border:1px solid var(--line-strong);
+  border-radius:var(--radius);
+  padding:6px 14px;
+}
+.golf-line{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+  gap:12px;
+}
+.golf-line:last-child{border-bottom:none;}
+.golf-who{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;min-width:0;}
+.golf-who .jersey{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:var(--card-hi);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--muted);
+  border:1px solid var(--line-strong);
+}
+.golf-line.winner .golf-who{color:var(--cyan);}
+.golf-line.winner .golf-who .jersey{background:rgba(45,226,230,0.15);color:var(--cyan);border-color:transparent;}
+.golf-trophy{display:none;font-size:13px;}
+.golf-line.winner .golf-trophy{display:inline;}
 
 /* Buttons */
 .btn{
@@ -239,6 +276,7 @@ section.block .sub{color:var(--muted);font-size:13px;margin:0 0 18px;}
 }
 .btn:active{transform:scale(.96);}
 .btn-primary{background:var(--grad-main);color:var(--bg-deep);box-shadow:0 6px 18px rgba(255,61,138,0.3);}
+.btn-primary.golf{background:var(--grad-golf);box-shadow:0 6px 18px rgba(45,226,230,0.25);}
 .btn-primary:disabled{background:var(--card-hi);color:var(--muted);cursor:not-allowed;box-shadow:none;}
 .btn-primary:not(:disabled):hover{filter:brightness(1.08);}
 .btn-outline{background:transparent;border-color:var(--line-strong);color:var(--ink);}
@@ -272,6 +310,10 @@ tr:nth-child(3) .rank{color:#E0A46E;}
 .status-done{background:rgba(45,226,230,0.15);color:var(--cyan);}
 .db-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
 .small-muted{color:var(--muted);font-size:12px;}
+.section-divider{margin:34px 0 18px;color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:700;text-align:center;position:relative;}
+.section-divider::before,.section-divider::after{content:"";position:absolute;top:50%;width:32%;height:1px;background:var(--line-strong);}
+.section-divider::before{left:0;}
+.section-divider::after{right:0;}
 
 footer{text-align:center;color:var(--muted);font-size:11px;letter-spacing:.5px;padding:34px 16px 0;}
 
@@ -286,46 +328,71 @@ footer{text-align:center;color:var(--muted);font-size:11px;letter-spacing:.5px;p
 <body>
 
 <header>
-  <h1>Ligue de <span>Foot</span></h1>
-  <p>Nazih · Lilian · Grégoire · Clément — 2v2</p>
+  <h1>Ligue de <span>Jeux</span></h1>
+  <p>Nazih · Lilian · Grégoire · Clément — Foot &amp; Mini Golf</p>
 </header>
 
 <nav class="tabs">
-  <button class="tab active" data-tab="match">Match</button>
+  <button class="tab active" data-tab="foot">⚽ Foot</button>
+  <button class="tab" data-tab="minigolf">⛳ Mini Golf</button>
   <button class="tab" data-tab="classement">Classement</button>
   <button class="tab" data-tab="database">Base de données</button>
 </nav>
 
 <main>
 
-  <!-- VUE 1 : MATCH -->
-  <div class="view active" id="view-match">
+  <!-- VUE : FOOT -->
+  <div class="view active" id="view-foot">
     <section class="block">
       <h2>Composer un match</h2>
       <p class="sub">Choisis 2 joueurs pour l'équipe A — les 2 autres forment l'équipe B.</p>
-      <div class="chip-row" id="player-chips"></div>
-      <div id="live-preview"></div>
+      <div class="chip-row" id="foot-chips"></div>
+      <div id="foot-live-preview"></div>
       <div class="btn-row">
-        <button class="btn btn-primary" id="btn-ready" disabled>Prêt ✔</button>
+        <button class="btn btn-primary" id="foot-btn-ready" disabled>Prêt ✔</button>
       </div>
     </section>
 
     <section class="block">
       <h2>En attente de résultat</h2>
       <p class="sub">Ces matchs sont prêts — ajoute le score une fois la partie terminée.</p>
-      <div id="pending-list"></div>
+      <div id="foot-pending-list"></div>
     </section>
 
     <section class="block">
       <h2>Derniers résultats</h2>
-      <div id="recent-list"></div>
+      <div id="foot-recent-list"></div>
     </section>
   </div>
 
-  <!-- VUE 2 : CLASSEMENT -->
+  <!-- VUE : MINI GOLF -->
+  <div class="view" id="view-minigolf">
+    <section class="block">
+      <h2>Composer une partie</h2>
+      <p class="sub">Choisis 2, 3 ou 4 joueurs — chacun joue pour soi, le plus de points gagne.</p>
+      <div class="chip-row" id="golf-chips"></div>
+      <div id="golf-live-preview"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary golf" id="golf-btn-ready" disabled>Prêt ✔</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>En attente de résultat</h2>
+      <p class="sub">Ces parties sont prêtes — ajoute les points une fois la partie terminée.</p>
+      <div id="golf-pending-list"></div>
+    </section>
+
+    <section class="block">
+      <h2>Derniers résultats</h2>
+      <div id="golf-recent-list"></div>
+    </section>
+  </div>
+
+  <!-- VUE : CLASSEMENT -->
   <div class="view" id="view-classement">
     <section class="block">
-      <h2>Classement joueurs</h2>
+      <h2>⚽ Classement joueurs — Foot</h2>
       <p class="sub">Classé par % de victoires.</p>
       <table>
         <thead><tr><th></th><th>Joueur</th><th>MJ</th><th>V</th><th>% Victoire</th></tr></thead>
@@ -333,28 +400,50 @@ footer{text-align:center;color:var(--muted);font-size:11px;letter-spacing:.5px;p
       </table>
     </section>
     <section class="block">
-      <h2>Classement équipes</h2>
+      <h2>⚽ Classement équipes — Foot</h2>
       <p class="sub">Chaque duo de coéquipiers.</p>
       <table>
         <thead><tr><th></th><th>Équipe</th><th>MJ</th><th>V</th><th>% Victoire</th></tr></thead>
         <tbody id="teams-rank"></tbody>
       </table>
     </section>
+    <section class="block">
+      <h2>⛳ Classement — Mini Golf</h2>
+      <p class="sub">Classé par % de victoires (égalités comptées comme victoire pour chacun).</p>
+      <table>
+        <thead><tr><th></th><th>Joueur</th><th>MJ</th><th>V</th><th>% Victoire</th></tr></thead>
+        <tbody id="golf-rank"></tbody>
+      </table>
+    </section>
   </div>
 
-  <!-- VUE 3 : DATABASE -->
+  <!-- VUE : DATABASE -->
   <div class="view" id="view-database">
     <section class="block">
       <div class="db-actions">
         <div>
-          <h2 style="margin-bottom:2px;">Base de données</h2>
-          <p class="small-muted" style="margin:0;">Tous les matchs enregistrés, bruts.</p>
+          <h2 style="margin-bottom:2px;">⚽ Base de données — Foot</h2>
+          <p class="small-muted" style="margin:0;">Tous les matchs de foot enregistrés, bruts.</p>
         </div>
-        <button class="btn btn-danger" id="btn-reset">Réinitialiser</button>
+        <button class="btn btn-danger" id="foot-btn-reset">Réinitialiser</button>
       </div>
       <table>
         <thead><tr><th>ID</th><th>Équipe A</th><th>Équipe B</th><th>Score</th><th>Statut</th><th>Date</th></tr></thead>
-        <tbody id="db-table"></tbody>
+        <tbody id="foot-db-table"></tbody>
+      </table>
+    </section>
+
+    <section class="block">
+      <div class="db-actions">
+        <div>
+          <h2 style="margin-bottom:2px;">⛳ Base de données — Mini Golf</h2>
+          <p class="small-muted" style="margin:0;">Toutes les parties de mini golf enregistrées, brutes.</p>
+        </div>
+        <button class="btn btn-danger" id="golf-btn-reset">Réinitialiser</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Joueurs</th><th>Points</th><th>Statut</th><th>Date</th></tr></thead>
+        <tbody id="golf-db-table"></tbody>
       </table>
     </section>
   </div>
@@ -371,8 +460,10 @@ const PLAYERS = [
   {name:"Clément", jersey:1},
 ];
 
-let matches = [];
-let selectedA = new Set();
+let footMatches = [];
+let golfMatches = [];
+let footSelectedA = new Set();
+let golfSelected = new Set();
 
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
@@ -382,8 +473,10 @@ const FIREBASE_PROJECT_ID = 'ligue-c57bd';
 const FIREBASE_API_KEY = 'AIzaSyBNzHF8EANVamHRVG7654rQSWa0ElsETQQ';
 const FIRESTORE_BASE = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
-function toFirestoreFields(m){
-  const intOrNull = (v) => (v===null || v===undefined) ? {nullValue:null} : {integerValue:String(v)};
+const intOrNull = (v) => (v===null || v===undefined) ? {nullValue:null} : {integerValue:String(v)};
+const getIntField = (f, field) => (f[field] && f[field].integerValue !== undefined) ? parseInt(f[field].integerValue,10) : null;
+
+function toFirestoreFieldsFoot(m){
   return {
     teamA: {arrayValue:{values: m.teamA.map(v=>({stringValue:v}))}},
     teamB: {arrayValue:{values: m.teamB.map(v=>({stringValue:v}))}},
@@ -394,44 +487,65 @@ function toFirestoreFields(m){
     completedAt: intOrNull(m.completedAt),
   };
 }
-
-function fromFirestoreDoc(doc){
+function fromFirestoreDocFoot(doc){
   const f = doc.fields || {};
   const id = doc.name.split('/').pop();
   const getArr = (field) => (f[field]?.arrayValue?.values || []).map(v=>v.stringValue);
-  const getInt = (field) => (f[field] && f[field].integerValue !== undefined) ? parseInt(f[field].integerValue,10) : null;
   return {
     id,
     teamA: getArr('teamA'),
     teamB: getArr('teamB'),
     status: f.status?.stringValue || 'ready',
-    scoreA: getInt('scoreA'),
-    scoreB: getInt('scoreB'),
-    createdAt: getInt('createdAt') || Date.now(),
-    completedAt: getInt('completedAt'),
+    scoreA: getIntField(f,'scoreA'),
+    scoreB: getIntField(f,'scoreB'),
+    createdAt: getIntField(f,'createdAt') || Date.now(),
+    completedAt: getIntField(f,'completedAt'),
   };
 }
 
-async function loadMatches(){
+function toFirestoreFieldsGolf(m){
+  return {
+    players: {arrayValue:{values: m.players.map(v=>({stringValue:v}))}},
+    scores: {arrayValue:{values: m.scores.map(s => s===null? {nullValue:null} : {integerValue:String(s)})}},
+    status: {stringValue: m.status},
+    createdAt: {integerValue: String(m.createdAt)},
+    completedAt: intOrNull(m.completedAt),
+  };
+}
+function fromFirestoreDocGolf(doc){
+  const f = doc.fields || {};
+  const id = doc.name.split('/').pop();
+  const players = (f.players?.arrayValue?.values || []).map(v=>v.stringValue);
+  const scores = (f.scores?.arrayValue?.values || []).map(v => v.integerValue !== undefined ? parseInt(v.integerValue,10) : null);
+  return {
+    id,
+    players,
+    scores,
+    status: f.status?.stringValue || 'ready',
+    createdAt: getIntField(f,'createdAt') || Date.now(),
+    completedAt: getIntField(f,'completedAt'),
+  };
+}
+
+async function loadCollection(collection, parseFn){
   try{
-    const res = await fetch(`${FIRESTORE_BASE}/matches?pageSize=300&key=${FIREBASE_API_KEY}`);
+    const res = await fetch(`${FIRESTORE_BASE}/${collection}?pageSize=300&key=${FIREBASE_API_KEY}`);
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if(!data.documents) return [];
-    return data.documents.map(fromFirestoreDoc);
+    return data.documents.map(parseFn);
   }catch(e){
     console.error('Erreur de chargement Firestore', e);
     alert("Impossible de charger les données depuis Firebase. Vérifie ta connexion ou les règles Firestore.");
     return [];
   }
 }
-
-async function saveMatch(match){
+async function saveDoc(collection, id, fields){
   try{
-    const res = await fetch(`${FIRESTORE_BASE}/matches/${match.id}?key=${FIREBASE_API_KEY}`, {
+    const res = await fetch(`${FIRESTORE_BASE}/${collection}/${id}?key=${FIREBASE_API_KEY}`, {
       method: 'PATCH',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({fields: toFirestoreFields(match)})
+      body: JSON.stringify({fields})
     });
     if(!res.ok) throw new Error('HTTP ' + res.status);
   }catch(e){
@@ -439,17 +553,15 @@ async function saveMatch(match){
     alert("La sauvegarde vers Firebase a échoué. Réessaie.");
   }
 }
-
-async function deleteMatchRemote(id){
+async function deleteDoc(collection, id){
   try{
-    await fetch(`${FIRESTORE_BASE}/matches/${id}?key=${FIREBASE_API_KEY}`, {method: 'DELETE'});
+    await fetch(`${FIRESTORE_BASE}/${collection}/${id}?key=${FIREBASE_API_KEY}`, {method: 'DELETE'});
   }catch(e){
     console.error('Erreur de suppression Firestore', e);
   }
 }
-
-async function resetAllMatches(){
-  await Promise.all(matches.map(m => deleteMatchRemote(m.id)));
+async function resetCollection(list, collection){
+  await Promise.all(list.map(m => deleteDoc(collection, m.id)));
 }
 
 // ---------- Helpers ----------
@@ -471,6 +583,12 @@ function allTeamCombos(){
   }
   return combos;
 }
+function golfWinners(m){
+  const filled = m.players.map((p,i)=>({name:p, score:m.scores[i]})).filter(x=>x.score!==null && x.score!==undefined);
+  if(filled.length===0) return [];
+  const max = Math.max(...filled.map(x=>x.score));
+  return filled.filter(x=>x.score===max).map(x=>x.name);
+}
 
 // ---------- Tabs ----------
 $$('.tab').forEach(tab=>{
@@ -484,36 +602,34 @@ $$('.tab').forEach(tab=>{
   });
 });
 
-// ---------- Player selection ----------
-function renderChips(){
-  const wrap = $('#player-chips');
+// ================= FOOT =================
+function renderFootChips(){
+  const wrap = $('#foot-chips');
   wrap.innerHTML = '';
   PLAYERS.forEach(p=>{
     const chip = document.createElement('button');
-    chip.className = 'chip' + (selectedA.has(p.name) ? ' selected' : '');
-    if(!selectedA.has(p.name) && selectedA.size >= 2) chip.classList.add('disabled');
+    chip.className = 'chip' + (footSelectedA.has(p.name) ? ' selected' : '');
+    if(!footSelectedA.has(p.name) && footSelectedA.size >= 2) chip.classList.add('disabled');
     chip.innerHTML = `<span class="jersey">${p.jersey}</span> ${p.name}`;
     chip.addEventListener('click', ()=>{
-      if(selectedA.has(p.name)) selectedA.delete(p.name);
-      else if(selectedA.size < 2) selectedA.add(p.name);
-      renderChips();
-      renderLivePreview();
+      if(footSelectedA.has(p.name)) footSelectedA.delete(p.name);
+      else if(footSelectedA.size < 2) footSelectedA.add(p.name);
+      renderFootChips();
+      renderFootLivePreview();
     });
     wrap.appendChild(chip);
   });
 }
-
-function currentTeams(){
-  if(selectedA.size !== 2) return null;
-  const teamA = Array.from(selectedA);
+function footCurrentTeams(){
+  if(footSelectedA.size !== 2) return null;
+  const teamA = Array.from(footSelectedA);
   const teamB = PLAYERS.map(p=>p.name).filter(n=>!teamA.includes(n));
   return {teamA, teamB};
 }
-
-function renderLivePreview(){
-  const teams = currentTeams();
-  const box = $('#live-preview');
-  const btn = $('#btn-ready');
+function renderFootLivePreview(){
+  const teams = footCurrentTeams();
+  const box = $('#foot-live-preview');
+  const btn = $('#foot-btn-ready');
   if(!teams){
     box.innerHTML = "<p class=\"hint\">Sélectionne exactement 2 joueurs pour l'équipe A.</p>";
     btn.disabled = true;
@@ -527,9 +643,8 @@ function renderLivePreview(){
       <div class="sb-team"><div class="names">${teams.teamB.join(' & ')}<small>Équipe B</small></div></div>
     </div>`;
 }
-
-$('#btn-ready').addEventListener('click', async ()=>{
-  const teams = currentTeams();
+$('#foot-btn-ready').addEventListener('click', async ()=>{
+  const teams = footCurrentTeams();
   if(!teams) return;
   const match = {
     id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
@@ -539,19 +654,19 @@ $('#btn-ready').addEventListener('click', async ()=>{
     scoreA: null,
     scoreB: null,
     createdAt: Date.now(),
+    completedAt: null,
   };
-  matches.unshift(match);
-  await saveMatch(match);
-  selectedA = new Set();
-  renderChips();
-  renderLivePreview();
-  renderMatchView();
+  footMatches.unshift(match);
+  await saveDoc('matches', match.id, toFirestoreFieldsFoot(match));
+  footSelectedA = new Set();
+  renderFootChips();
+  renderFootLivePreview();
+  renderFootView();
 });
 
-// ---------- Pending & recent ----------
-function renderPending(){
-  const list = $('#pending-list');
-  const pending = matches.filter(m=>m.status==='ready');
+function renderFootPending(){
+  const list = $('#foot-pending-list');
+  const pending = footMatches.filter(m=>m.status==='ready');
   if(pending.length===0){
     list.innerHTML = '<p class="empty">Aucun match en attente. Compose un match ci-dessus.</p>';
     return;
@@ -594,20 +709,19 @@ function renderPending(){
         alert("Renseigne les deux scores avant d'enregistrer.");
         return;
       }
-      const match = matches.find(m=>m.id===id);
+      const match = footMatches.find(m=>m.id===id);
       match.scoreA = parseInt(sa,10);
       match.scoreB = parseInt(sb,10);
       match.status = 'completed';
       match.completedAt = Date.now();
-      await saveMatch(match);
-      renderMatchView();
+      await saveDoc('matches', match.id, toFirestoreFieldsFoot(match));
+      renderFootView();
     });
   });
 }
-
-function renderRecent(){
-  const list = $('#recent-list');
-  const done = matches.filter(m=>m.status==='completed').sort((a,b)=>b.completedAt-a.completedAt).slice(0,6);
+function renderFootRecent(){
+  const list = $('#foot-recent-list');
+  const done = footMatches.filter(m=>m.status==='completed').sort((a,b)=>b.completedAt-a.completedAt).slice(0,6);
   if(done.length===0){
     list.innerHTML = '<p class="empty">Pas encore de résultat enregistré.</p>';
     return;
@@ -635,15 +749,152 @@ function renderRecent(){
     list.appendChild(card);
   });
 }
-
-function renderMatchView(){
-  renderPending();
-  renderRecent();
+function renderFootView(){
+  renderFootPending();
+  renderFootRecent();
 }
 
-// ---------- Classement ----------
+// ================= MINI GOLF =================
+function renderGolfChips(){
+  const wrap = $('#golf-chips');
+  wrap.innerHTML = '';
+  PLAYERS.forEach(p=>{
+    const chip = document.createElement('button');
+    chip.className = 'chip' + (golfSelected.has(p.name) ? ' selected' : '');
+    if(!golfSelected.has(p.name) && golfSelected.size >= 4) chip.classList.add('disabled');
+    chip.innerHTML = `<span class="jersey">${p.jersey}</span> ${p.name}`;
+    chip.addEventListener('click', ()=>{
+      if(golfSelected.has(p.name)) golfSelected.delete(p.name);
+      else if(golfSelected.size < 4) golfSelected.add(p.name);
+      renderGolfChips();
+      renderGolfLivePreview();
+    });
+    wrap.appendChild(chip);
+  });
+}
+function renderGolfLivePreview(){
+  const box = $('#golf-live-preview');
+  const btn = $('#golf-btn-ready');
+  if(golfSelected.size < 2){
+    box.innerHTML = "<p class=\"hint\">Sélectionne entre 2 et 4 joueurs.</p>";
+    btn.disabled = true;
+    return;
+  }
+  btn.disabled = false;
+  const names = Array.from(golfSelected);
+  box.innerHTML = `
+    <div class="golf-board">
+      ${names.map(n=>`
+        <div class="golf-line">
+          <div class="golf-who"><span class="jersey">${jerseyFor(n)}</span>${n}</div>
+        </div>`).join('')}
+    </div>`;
+}
+$('#golf-btn-ready').addEventListener('click', async ()=>{
+  if(golfSelected.size < 2) return;
+  const players = Array.from(golfSelected);
+  const match = {
+    id: 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+    players,
+    scores: players.map(()=>null),
+    status: 'ready',
+    createdAt: Date.now(),
+    completedAt: null,
+  };
+  golfMatches.unshift(match);
+  await saveDoc('golfMatches', match.id, toFirestoreFieldsGolf(match));
+  golfSelected = new Set();
+  renderGolfChips();
+  renderGolfLivePreview();
+  renderGolfView();
+});
+
+function renderGolfPending(){
+  const list = $('#golf-pending-list');
+  const pending = golfMatches.filter(m=>m.status==='ready');
+  if(pending.length===0){
+    list.innerHTML = '<p class="empty">Aucune partie en attente. Compose une partie ci-dessus.</p>';
+    return;
+  }
+  list.innerHTML = '';
+  pending.forEach(m=>{
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    card.innerHTML = `
+      <div class="top-row">
+        <span class="live-dot golf">En attente</span>
+        <span class="date">${fmtDate(m.createdAt)}</span>
+      </div>
+      <div class="golf-board">
+        ${m.players.map((p,i)=>`
+          <div class="golf-line">
+            <div class="golf-who"><span class="jersey">${jerseyFor(p)}</span>${p}</div>
+            <input type="number" class="score-input" data-id="${m.id}" data-idx="${i}" placeholder="0">
+          </div>`).join('')}
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-outline" data-save="${m.id}">Enregistrer le résultat</button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  $$('[data-save]', list).forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.save;
+      const match = golfMatches.find(m=>m.id===id);
+      const inputs = $$(`.score-input[data-id="${id}"]`, list);
+      const newScores = [];
+      for(const inp of inputs){
+        const v = inp.value.trim();
+        if(v === ''){
+          alert("Renseigne les points de tous les joueurs avant d'enregistrer.");
+          return;
+        }
+        newScores[parseInt(inp.dataset.idx,10)] = parseInt(v,10);
+      }
+      match.scores = newScores;
+      match.status = 'completed';
+      match.completedAt = Date.now();
+      await saveDoc('golfMatches', match.id, toFirestoreFieldsGolf(match));
+      renderGolfView();
+    });
+  });
+}
+function renderGolfRecent(){
+  const list = $('#golf-recent-list');
+  const done = golfMatches.filter(m=>m.status==='completed').sort((a,b)=>b.completedAt-a.completedAt).slice(0,6);
+  if(done.length===0){
+    list.innerHTML = '<p class="empty">Pas encore de résultat enregistré.</p>';
+    return;
+  }
+  list.innerHTML = '';
+  done.forEach(m=>{
+    const winners = golfWinners(m);
+    const ranked = m.players.map((p,i)=>({name:p, score:m.scores[i]})).sort((a,b)=>b.score-a.score);
+    const card = document.createElement('div');
+    card.className = 'match-card';
+    card.innerHTML = `
+      <div class="top-row"><span></span><span class="date">${fmtDate(m.completedAt)}</span></div>
+      <div class="golf-board">
+        ${ranked.map(r=>`
+          <div class="golf-line ${winners.includes(r.name)?'winner':''}">
+            <div class="golf-who"><span class="golf-trophy">🏆</span><span class="jersey">${jerseyFor(r.name)}</span>${r.name}</div>
+            <div class="score-digit" style="width:auto;min-width:40px;padding:0 10px;">${r.score}</div>
+          </div>`).join('')}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+function renderGolfView(){
+  renderGolfPending();
+  renderGolfRecent();
+}
+
+// ================= CLASSEMENT =================
 function renderClassement(){
-  const done = matches.filter(m=>m.status==='completed');
+  const done = footMatches.filter(m=>m.status==='completed');
 
   const playerStats = PLAYERS.map(p=>{
     let mj=0, v=0;
@@ -710,49 +961,121 @@ function renderClassement(){
     `;
     tBody.appendChild(tr);
   });
-}
 
-// ---------- Database ----------
-function renderDatabase(){
-  const tbody = $('#db-table');
-  if(matches.length===0){
-    tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucune donnée pour le moment.</td></tr>';
-    return;
-  }
-  const sorted = [...matches].sort((a,b)=>b.createdAt-a.createdAt);
-  tbody.innerHTML = '';
-  sorted.forEach(m=>{
+  const golfDone = golfMatches.filter(m=>m.status==='completed');
+  const golfStats = PLAYERS.map(p=>{
+    let mj=0, v=0;
+    golfDone.forEach(m=>{
+      const idx = m.players.indexOf(p.name);
+      if(idx === -1) return;
+      mj++;
+      const winners = golfWinners(m);
+      if(winners.includes(p.name)) v++;
+    });
+    return {name:p.name, jersey:p.jersey, mj, v, pct: mj>0 ? Math.round((v/mj)*100) : null};
+  }).sort((a,b)=>{
+    if(a.pct===null && b.pct===null) return 0;
+    if(a.pct===null) return 1;
+    if(b.pct===null) return -1;
+    return b.pct - a.pct || b.mj - a.mj;
+  });
+
+  const gBody = $('#golf-rank');
+  gBody.innerHTML = '';
+  golfStats.forEach((p,i)=>{
     const tr = document.createElement('tr');
-    const score = m.status==='completed' ? `${m.scoreA} – ${m.scoreB}` : '—';
-    const badge = m.status==='completed'
-      ? '<span class="status-badge status-done">Terminé</span>'
-      : '<span class="status-badge status-ready">En attente</span>';
     tr.innerHTML = `
-      <td class="small-muted">${m.id.slice(0,10)}…</td>
-      <td>${m.teamA.join(' & ')}</td>
-      <td>${m.teamB.join(' & ')}</td>
-      <td>${score}</td>
-      <td>${badge}</td>
-      <td class="small-muted">${fmtDate(m.createdAt)}</td>
+      <td class="rank">${i+1}</td>
+      <td>${p.name} <span class="small-muted">#${p.jersey}</span></td>
+      <td>${p.mj}</td>
+      <td>${p.v}</td>
+      <td class="pct">${p.pct===null ? '—' : p.pct+'%'}</td>
     `;
-    tbody.appendChild(tr);
+    gBody.appendChild(tr);
   });
 }
 
-$('#btn-reset').addEventListener('click', async ()=>{
-  if(!confirm('Supprimer tous les matchs de la ligue pour tout le monde ? Cette action est irréversible.')) return;
-  await resetAllMatches();
-  matches = [];
+// ================= DATABASE =================
+function renderDatabase(){
+  const footBody = $('#foot-db-table');
+  if(footMatches.length===0){
+    footBody.innerHTML = '<tr><td colspan="6" class="empty">Aucune donnée pour le moment.</td></tr>';
+  } else {
+    const sorted = [...footMatches].sort((a,b)=>b.createdAt-a.createdAt);
+    footBody.innerHTML = '';
+    sorted.forEach(m=>{
+      const tr = document.createElement('tr');
+      const score = m.status==='completed' ? `${m.scoreA} – ${m.scoreB}` : '—';
+      const badge = m.status==='completed'
+        ? '<span class="status-badge status-done">Terminé</span>'
+        : '<span class="status-badge status-ready">En attente</span>';
+      tr.innerHTML = `
+        <td class="small-muted">${m.id.slice(0,10)}…</td>
+        <td>${m.teamA.join(' & ')}</td>
+        <td>${m.teamB.join(' & ')}</td>
+        <td>${score}</td>
+        <td>${badge}</td>
+        <td class="small-muted">${fmtDate(m.createdAt)}</td>
+      `;
+      footBody.appendChild(tr);
+    });
+  }
+
+  const golfBody = $('#golf-db-table');
+  if(golfMatches.length===0){
+    golfBody.innerHTML = '<tr><td colspan="5" class="empty">Aucune donnée pour le moment.</td></tr>';
+  } else {
+    const sorted = [...golfMatches].sort((a,b)=>b.createdAt-a.createdAt);
+    golfBody.innerHTML = '';
+    sorted.forEach(m=>{
+      const tr = document.createElement('tr');
+      const points = m.status==='completed'
+        ? m.players.map((p,i)=>`${p}: ${m.scores[i]}`).join(', ')
+        : '—';
+      const badge = m.status==='completed'
+        ? '<span class="status-badge status-done">Terminé</span>'
+        : '<span class="status-badge status-ready">En attente</span>';
+      tr.innerHTML = `
+        <td class="small-muted">${m.id.slice(0,10)}…</td>
+        <td>${m.players.join(', ')}</td>
+        <td>${points}</td>
+        <td>${badge}</td>
+        <td class="small-muted">${fmtDate(m.createdAt)}</td>
+      `;
+      golfBody.appendChild(tr);
+    });
+  }
+}
+
+$('#foot-btn-reset').addEventListener('click', async ()=>{
+  if(!confirm('Supprimer tous les matchs de foot pour tout le monde ? Cette action est irréversible.')) return;
+  await resetCollection(footMatches, 'matches');
+  footMatches = [];
   renderDatabase();
-  renderMatchView();
+  renderFootView();
+  renderClassement();
+});
+$('#golf-btn-reset').addEventListener('click', async ()=>{
+  if(!confirm('Supprimer toutes les parties de mini golf pour tout le monde ? Cette action est irréversible.')) return;
+  await resetCollection(golfMatches, 'golfMatches');
+  golfMatches = [];
+  renderDatabase();
+  renderGolfView();
+  renderClassement();
 });
 
 // ---------- Init ----------
 (async function init(){
-  matches = await loadMatches();
-  renderChips();
-  renderLivePreview();
-  renderMatchView();
+  [footMatches, golfMatches] = await Promise.all([
+    loadCollection('matches', fromFirestoreDocFoot),
+    loadCollection('golfMatches', fromFirestoreDocGolf),
+  ]);
+  renderFootChips();
+  renderFootLivePreview();
+  renderFootView();
+  renderGolfChips();
+  renderGolfLivePreview();
+  renderGolfView();
   renderClassement();
   renderDatabase();
 })();
