@@ -144,6 +144,35 @@ section.block h2{
 }
 section.block .sub{color:var(--muted);font-size:13px;margin:0 0 18px;}
 
+/* Mode toggle — 2v2 / 1v1 */
+.mode-toggle{
+  display:inline-flex;
+  gap:4px;
+  background:var(--bg-mid);
+  border:1px solid var(--line-strong);
+  border-radius:999px;
+  padding:4px;
+  margin:2px 0 18px;
+}
+.mode-btn{
+  background:none;
+  border:none;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.3px;
+  padding:7px 16px;
+  border-radius:999px;
+  font-family:'Fredoka',sans-serif;
+  transition:color .15s, background .15s;
+}
+.mode-btn:hover{color:var(--ink);}
+.mode-btn.active{
+  color:var(--bg-deep);
+  background:var(--grad-main);
+  box-shadow:0 4px 12px rgba(255,61,138,0.3);
+}
+
 /* Player chips — avatar bubbles */
 .chip-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;}
 .chip{
@@ -345,7 +374,11 @@ footer{text-align:center;color:var(--muted);font-size:11px;letter-spacing:.5px;p
   <div class="view active" id="view-foot">
     <section class="block">
       <h2>Composer un match</h2>
-      <p class="sub">Choisis 2 joueurs pour l'équipe A — les 2 autres forment l'équipe B.</p>
+      <p class="sub" id="foot-compose-sub">Choisis 2 joueurs pour l'équipe A — les 2 autres forment l'équipe B.</p>
+      <div class="mode-toggle" id="foot-mode-toggle">
+        <button class="mode-btn active" data-mode="2v2">2v2</button>
+        <button class="mode-btn" data-mode="1v1">1v1</button>
+      </div>
       <div class="chip-row" id="foot-chips"></div>
       <div id="foot-live-preview"></div>
       <div class="btn-row">
@@ -464,6 +497,7 @@ let footMatches = [];
 let golfMatches = [];
 let footSelectedA = new Set();
 let golfSelected = new Set();
+let footMode = '2v2';
 
 const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
@@ -603,6 +637,21 @@ $$('.tab').forEach(tab=>{
 });
 
 // ================= FOOT =================
+function setFootMode(mode){
+  if(mode === footMode) return;
+  footMode = mode;
+  footSelectedA = new Set();
+  $$('.mode-btn', $('#foot-mode-toggle')).forEach(b=> b.classList.toggle('active', b.dataset.mode === mode));
+  $('#foot-compose-sub').textContent = footMode === '2v2'
+    ? "Choisis 2 joueurs pour l'équipe A — les 2 autres forment l'équipe B."
+    : "Choisis 2 joueurs — le 1er affronte le 2nd en 1 contre 1.";
+  renderFootChips();
+  renderFootLivePreview();
+}
+$$('.mode-btn', $('#foot-mode-toggle')).forEach(b=>{
+  b.addEventListener('click', ()=> setFootMode(b.dataset.mode));
+});
+
 function renderFootChips(){
   const wrap = $('#foot-chips');
   wrap.innerHTML = '';
@@ -621,26 +670,35 @@ function renderFootChips(){
   });
 }
 function footCurrentTeams(){
-  if(footSelectedA.size !== 2) return null;
-  const teamA = Array.from(footSelectedA);
-  const teamB = PLAYERS.map(p=>p.name).filter(n=>!teamA.includes(n));
-  return {teamA, teamB};
+  const selected = Array.from(footSelectedA);
+  if(selected.length !== 2) return null;
+  if(footMode === '2v2'){
+    const teamA = selected;
+    const teamB = PLAYERS.map(p=>p.name).filter(n=>!teamA.includes(n));
+    return {teamA, teamB};
+  }
+  // 1v1 : le 1er joueur sélectionné forme l'équipe A, le 2nd l'équipe B
+  return {teamA:[selected[0]], teamB:[selected[1]]};
 }
 function renderFootLivePreview(){
   const teams = footCurrentTeams();
   const box = $('#foot-live-preview');
   const btn = $('#foot-btn-ready');
   if(!teams){
-    box.innerHTML = "<p class=\"hint\">Sélectionne exactement 2 joueurs pour l'équipe A.</p>";
+    box.innerHTML = footMode === '2v2'
+      ? "<p class=\"hint\">Sélectionne exactement 2 joueurs pour l'équipe A.</p>"
+      : "<p class=\"hint\">Sélectionne 2 joueurs : le 1er contre le 2nd.</p>";
     btn.disabled = true;
     return;
   }
   btn.disabled = false;
+  const labelA = teams.teamA.length > 1 ? 'Équipe A' : (footMode === '1v1' ? 'Joueur 1' : 'Équipe A');
+  const labelB = teams.teamB.length > 1 ? 'Équipe B' : (footMode === '1v1' ? 'Joueur 2' : 'Équipe B');
   box.innerHTML = `
     <div class="scoreboard">
-      <div class="sb-team"><div class="names">${teams.teamA.join(' & ')}<small>Équipe A</small></div></div>
+      <div class="sb-team"><div class="names">${teams.teamA.join(' & ')}<small>${labelA}</small></div></div>
       <div class="sb-mid"><span class="brand-vs">VS</span></div>
-      <div class="sb-team"><div class="names">${teams.teamB.join(' & ')}<small>Équipe B</small></div></div>
+      <div class="sb-team"><div class="names">${teams.teamB.join(' & ')}<small>${labelB}</small></div></div>
     </div>`;
 }
 $('#foot-btn-ready').addEventListener('click', async ()=>{
@@ -681,7 +739,7 @@ function renderFootPending(){
         <span class="date">${fmtDate(m.createdAt)}</span>
       </div>
       <div class="scoreboard">
-        <div class="sb-team"><div class="names">${m.teamA.join(' & ')}<small>Équipe A</small></div></div>
+        <div class="sb-team"><div class="names">${m.teamA.join(' & ')}<small>${m.teamA.length>1?'Équipe A':'Joueur 1'}</small></div></div>
         <div class="sb-mid">
           <div class="sb-score">
             <input type="number" min="0" class="score-input" data-side="A" data-id="${m.id}" placeholder="0">
@@ -689,7 +747,7 @@ function renderFootPending(){
             <input type="number" min="0" class="score-input" data-side="B" data-id="${m.id}" placeholder="0">
           </div>
         </div>
-        <div class="sb-team"><div class="names">${m.teamB.join(' & ')}<small>Équipe B</small></div></div>
+        <div class="sb-team"><div class="names">${m.teamB.join(' & ')}<small>${m.teamB.length>1?'Équipe B':'Joueur 2'}</small></div></div>
       </div>
       <div class="btn-row">
         <button class="btn btn-outline" data-save="${m.id}">Enregistrer le résultat</button>
@@ -933,8 +991,8 @@ function renderClassement(){
     const key = pairKey(a,b);
     let mj=0, v=0;
     done.forEach(m=>{
-      const asA = pairKey(m.teamA[0], m.teamA[1]) === key;
-      const asB = pairKey(m.teamB[0], m.teamB[1]) === key;
+      const asA = m.teamA.length===2 && pairKey(m.teamA[0], m.teamA[1]) === key;
+      const asB = m.teamB.length===2 && pairKey(m.teamB[0], m.teamB[1]) === key;
       if(!asA && !asB) return;
       mj++;
       if(asA && m.scoreA > m.scoreB) v++;
